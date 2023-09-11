@@ -39,6 +39,12 @@ func parseArgs() {
 	flag.StringVar(&softwareURL, `softwareURL`, softwareURL, `--softwareURL `+softwareURL)
 	flag.StringVar(&binName, `name`, binName, `--name `+binName)
 	flag.StringVar(&saveDir, `saveDir`, saveDir, `--saveDir `+saveDir)
+	defaultUsage := flag.Usage
+	flag.Usage = func() {
+		defaultUsage()
+		fmt.Println()
+		fmt.Println(`Command Format:`, os.Args[0], `install|upgrade|up|uninstall|un`, `5.0.0`, `[saveDir]`)
+	}
 	flag.Parse()
 
 	var extName string
@@ -72,8 +78,6 @@ func parseArgs() {
 		operate = args[0]
 	default:
 		flag.Usage()
-		fmt.Println()
-		fmt.Println(`Command Format:`, os.Args[0], `install|upgrade|up|uninstall|un`, `5.0.0`, `[saveDir]`)
 		os.Exit(0)
 	}
 }
