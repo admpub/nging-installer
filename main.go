@@ -20,11 +20,11 @@ var osName = runtime.GOOS
 var archName = runtime.GOARCH
 var operate = `install`
 var version = `5.1.2`
-var saveDir = `nging`
+var saveDir string
 var softwareURL = `https://img.nging.coscms.com/nging/v%s/`
 var binName = "nging"
-var fileName = fmt.Sprintf("nging_%s_%s", osName, archName)
-var fileFullName = fileName + ".tar.gz"
+var fileName string
+var fileFullName string
 var softwareFullURL string
 var workDir string
 var local string
@@ -37,20 +37,39 @@ var supports = map[string][]string{
 func parseArgs() {
 	flag.StringVar(&local, `local`, ``, `--local ./nging_darwin_amd64.tar.gz`)
 	flag.StringVar(&softwareURL, `softwareURL`, softwareURL, `--softwareURL `+softwareURL)
+	flag.StringVar(&binName, `name`, binName, `--name `+binName)
+	flag.StringVar(&saveDir, `saveDir`, saveDir, `--saveDir `+saveDir)
 	flag.Parse()
-	if len(os.Args) > 4 {
-		os.Args = os.Args[0:4]
+
+	var extName string
+	if osName == `windows` {
+		extName = `.exe`
 	}
-	switch len(os.Args) {
-	case 4:
-		saveDir = os.Args[3]
-		fallthrough
+	if len(binName) == 0 {
+		binName = strings.TrimSuffix(filepath.Base(os.Args[0]), `-installer`+extName)
+	}
+	parts := strings.SplitN(binName, `.`, 2)
+	if len(parts) == 1 && len(extName) > 0 {
+		binName += extName
+	}
+	name := parts[0]
+	if len(saveDir) == 0 {
+		saveDir = name
+	}
+	fileName = fmt.Sprintf("%s_%s_%s", name, osName, archName)
+	fileFullName = fileName + ".tar.gz"
+	args := make([]string, len(flag.Args()))
+	copy(args, flag.Args())
+	switch len(args) {
 	case 3:
-		version = os.Args[2]
-		version = strings.TrimPrefix(version, `v`)
+		saveDir = args[2]
 		fallthrough
 	case 2:
-		operate = os.Args[1]
+		version = args[1]
+		version = strings.TrimPrefix(version, `v`)
+		fallthrough
+	case 1:
+		operate = args[0]
 	}
 }
 
