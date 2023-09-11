@@ -70,6 +70,11 @@ func parseArgs() {
 		fallthrough
 	case 1:
 		operate = args[0]
+	default:
+		flag.Usage()
+		fmt.Println()
+		fmt.Println(`Command Format:`, os.Args[0], `install|upgrade|up|uninstall|un`, `5.0.0`, `[saveDir]`)
+		os.Exit(0)
 	}
 }
 
