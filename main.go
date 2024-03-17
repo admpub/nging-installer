@@ -32,6 +32,7 @@ var supports = map[string][]string{
 	`darwin`:  {`amd64`, `arm64`},
 	`linux`:   {`386`, `amd64`, `arm64`, `arm-7`, `arm-6`, `arm-5`},
 	`windows`: {`386`, `amd64`},
+	`freebsd`: {`amd64`},
 }
 
 func parseArgs() {
@@ -87,7 +88,7 @@ func verifyOSAndArch() {
 		com.ExitOnFailure(`Unsupported System:`+osName, 1)
 	}
 	switch archName {
-	case `x86_64`:
+	case `x86_64`, `amd64`:
 		archName = "amd64"
 	case "i386", "i686":
 		archName = "386"
