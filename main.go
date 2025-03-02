@@ -19,7 +19,7 @@ import (
 var osName = runtime.GOOS
 var archName = runtime.GOARCH
 var operate = `install`
-var version = `5.1.2`
+var version = `5.2.7`
 var saveDir string
 var softwareURL = `https://img.nging.coscms.com/nging/v%s/`
 var binName = "nging"
@@ -35,7 +35,11 @@ var supports = map[string][]string{
 	`freebsd`: {`amd64`},
 }
 
+var VERSION = `0.0.2`
+
 func parseArgs() {
+	var showVersion bool
+	flag.BoolVar(&showVersion, `version`, showVersion, `--version true`)
 	flag.StringVar(&local, `local`, ``, `--local ./nging_darwin_amd64.tar.gz`)
 	flag.StringVar(&softwareURL, `softwareURL`, softwareURL, `--softwareURL `+softwareURL)
 	flag.StringVar(&binName, `name`, binName, `--name `+binName)
@@ -47,6 +51,10 @@ func parseArgs() {
 		fmt.Println(`Command Format:`, os.Args[0], `install|upgrade|up|uninstall|un`, `5.0.0`, `[saveDir]`)
 	}
 	flag.Parse()
+	if showVersion {
+		fmt.Println(`v` + VERSION)
+		return
+	}
 
 	var extName string
 	if osName == `windows` {
@@ -166,11 +174,13 @@ func downloadAndExtract() {
 		com.ExitOnFailure(err.Error(), 1)
 	}
 	distDir := filepath.Join(saveDir, fileName)
-	err = com.CopyDir(distDir, saveDir)
-	if err != nil {
-		com.ExitOnFailure(err.Error(), 1)
+	if com.IsDir(distDir) {
+		err = com.CopyDir(distDir, saveDir)
+		if err != nil {
+			com.ExitOnFailure(err.Error(), 1)
+		}
+		os.RemoveAll(distDir)
 	}
-	os.RemoveAll(distDir)
 	if len(local) == 0 {
 		os.Remove(compressedFile)
 	}
